@@ -1,0 +1,35 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    server_tokens off;
+    access_log off;
+    error_log /dev/null crit;
+
+    client_header_buffer_size 1k;
+    large_client_header_buffers 4 2k;
+    connection_pool_size 512;
+
+    return 444;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{DOMAIN}} {{REALITY_DOMAIN}}{{XHTTP_SERVER_NAME}};
+
+    server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
+
+    location / {
+        if ($request_method !~ ^(GET|HEAD)$) {
+            return 444;
+        }
+
+        return 301 https://$host$request_uri;
+    }
+}

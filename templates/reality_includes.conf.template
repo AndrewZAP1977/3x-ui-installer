@@ -1,0 +1,26 @@
+### XHTTP ###
+
+location ^~ /{{XHTTP_PATH}}
+{
+    grpc_pass grpc://unix:{{XHTTP_SOCKET}};
+    grpc_buffer_size 16k;
+    grpc_socket_keepalive on;
+    grpc_read_timeout 1h;
+    grpc_send_timeout 1h;
+    grpc_set_header Connection "";
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    grpc_set_header X-Forwarded-Proto $scheme;
+    grpc_set_header X-Forwarded-Port $server_port;
+    grpc_set_header Host $host;
+    grpc_set_header X-Forwarded-Host $host;
+}
+
+location ~* \.(css|js|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot|map)$
+{
+    try_files $uri =404;
+}
+
+location /
+{
+    try_files $uri $uri/ /index.html;
+}

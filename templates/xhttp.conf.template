@@ -1,0 +1,23 @@
+server
+{
+    server_tokens off;
+    server_name {{XHTTP_DOMAIN}};
+
+    listen 127.0.0.1:9444 ssl http2;
+
+    root {{FAKESITE3_ROOT}};
+    index index.html index.htm index.php index.nginx-debian.html;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!eNULL:!MD5:!DES:!RC4:!ADH:!SSLv3:!EXP:!PSK:!DSS;
+
+    ssl_certificate /etc/letsencrypt/live/{{XHTTP_DOMAIN}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{XHTTP_DOMAIN}}/privkey.pem;
+
+    if ($request_uri ~ "(\"|'|`|~|,|:|;|%|\$|&&|\?\?|0x00|0X00|\||\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)")
+    {
+        set $hack 1;
+    }
+
+    include /etc/nginx/snippets/xhttp_includes.conf;
+}
