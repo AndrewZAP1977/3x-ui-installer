@@ -55,12 +55,18 @@ render_nginx_templates() {
     render_template \
         "${SCRIPT_DIR}/templates/panel.conf.template" \
         "/etc/nginx/sites-available/panel.conf"
-    render_template \
-        "${SCRIPT_DIR}/templates/reality.conf.template" \
+    render_fake_https_site_template \
+        "$REALITY_DOMAIN" \
+        "9443" \
+        "/var/www/html/fakesite_2/" \
+        "reality_includes.conf" \
         "/etc/nginx/sites-available/reality.conf"
     if [[ "$INSTALL_PROFILE" == "separate-xhttp-sni" ]]; then
-        render_template \
-            "${SCRIPT_DIR}/templates/xhttp.conf.template" \
+        render_fake_https_site_template \
+            "$XHTTP_DOMAIN" \
+            "9444" \
+            "/var/www/html/fakesite_3/" \
+            "xhttp_includes.conf" \
             "/etc/nginx/sites-available/xhttp.conf"
     fi
     render_template \
@@ -157,8 +163,6 @@ render_template() {
     local xhttp_stream_map=""
     local xhttp_stream_upstream=""
     local panel_listen_directive
-    local reality_listen_directive
-    local xhttp_listen_directive
     local http2_directive
     if [[ "$INSTALL_PROFILE" == "separate-xhttp-sni" ]]; then
         xhttp_server_name=" ${XHTTP_DOMAIN}"
@@ -167,13 +171,9 @@ render_template() {
     fi
     if nginx_supports_http2_on_directive; then
         panel_listen_directive="listen 127.0.0.1:7443 ssl proxy_protocol;"
-        reality_listen_directive="listen 127.0.0.1:9443 ssl;"
-        xhttp_listen_directive="listen 127.0.0.1:9444 ssl;"
         http2_directive="    http2 on;"
     else
         panel_listen_directive="listen 127.0.0.1:7443 ssl http2 proxy_protocol;"
-        reality_listen_directive="listen 127.0.0.1:9443 ssl http2;"
-        xhttp_listen_directive="listen 127.0.0.1:9444 ssl http2;"
         http2_directive=""
     fi
     sed \
@@ -184,8 +184,6 @@ render_template() {
         -e "s|{{XHTTP_STREAM_MAP}}|$xhttp_stream_map|g" \
         -e "s|{{XHTTP_STREAM_UPSTREAM}}|$xhttp_stream_upstream|g" \
         -e "s|{{PANEL_LISTEN_DIRECTIVE}}|$panel_listen_directive|g" \
-        -e "s|{{REALITY_LISTEN_DIRECTIVE}}|$reality_listen_directive|g" \
-        -e "s|{{XHTTP_LISTEN_DIRECTIVE}}|$xhttp_listen_directive|g" \
         -e "s|{{HTTP2_DIRECTIVE}}|$http2_directive|g" \
         -e "s|{{PANEL_PORT}}|$PANEL_PORT|g" \
         -e "s|{{PANEL_PATH}}|$PANEL_PATH|g" \
@@ -197,6 +195,31 @@ render_template() {
         -e "s|{{FAKESITE2_ROOT}}|/var/www/html/fakesite_2/|g" \
         -e "s|{{FAKESITE3_ROOT}}|/var/www/html/fakesite_3/|g" \
         "$template_file" > "$output_file"
+}
+
+### Render fake HTTPS site template ###
+render_fake_https_site_template() {
+    local domain="$1"
+    local listen_port="$2"
+    local root_path="$3"
+    local include_file="$4"
+    local output_file="$5"
+    local listen_directive
+    local http2_directive
+    if nginx_supports_http2_on_directive; then
+        listen_directive="listen 127.0.0.1:${listen_port} ssl;"
+        http2_directive="    http2 on;"
+    else
+        listen_directive="listen 127.0.0.1:${listen_port} ssl http2;"
+        http2_directive=""
+    fi
+    sed \
+        -e "s|{{FAKE_SITE_DOMAIN}}|$domain|g" \
+        -e "s|{{FAKE_SITE_LISTEN_DIRECTIVE}}|$listen_directive|g" \
+        -e "s|{{HTTP2_DIRECTIVE}}|$http2_directive|g" \
+        -e "s|{{FAKE_SITE_ROOT}}|$root_path|g" \
+        -e "s|{{FAKE_SITE_INCLUDE}}|$include_file|g" \
+        "${SCRIPT_DIR}/templates/fake_https_site.conf.template" > "$output_file"
 }
 
 ### Request SSL certificate ###
