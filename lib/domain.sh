@@ -33,8 +33,8 @@ Options:
             Domain #3: XHTTP REALITY inbound on its own SNI/domain, fake site.
 
   -auto-domain, --auto-domain
-      Generate random subdomains automatically.
-      Requires AUTO_DOMAIN_BASE to be configured inside the installer flow.
+      Generate temporary domains automatically using third-party cdn-one.org DNS.
+      Intended only for testing, disposable VPS deployments, and quick experiments.
 
   -domain, --domain DOMAIN
       Panel domain.
@@ -435,11 +435,19 @@ validate_domain_dns() {
     return 0
 }
 
+### Show auto-domain warning ###
+show_auto_domain_warning() {
+    msg_inf "Auto-domain mode:" "uses third-party cdn-one.org DNS"
+    msg_inf "Auto-domain scope:" "testing/disposable VPS only; use your own domains for production"
+    msg_blank
+}
+
 ### Resolve domains ###
 resolve_domains() {
     msg_inf "Resolving domains..."
     msg_blank
     if [[ "$AUTO_DOMAIN" == true ]]; then
+        show_auto_domain_warning
         generate_auto_domains
     fi
     if [[ -n "$DOMAIN" ]]; then
