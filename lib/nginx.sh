@@ -163,7 +163,10 @@ request_ssl_certificate() {
     local log_file
     local diagnostic_lines
     if certificate_exists "$domain"; then
-        validate_certificate "$domain" && return 0
+        if validate_certificate "$domain"; then
+            normalize_certbot_renewal_config "$domain"
+            return 0
+        fi
     fi
     mkdir -p "$log_dir"
     safe_domain="${domain//[^a-zA-Z0-9._-]/_}"
@@ -192,7 +195,8 @@ request_ssl_certificate() {
         echo "  tail -n 80 $log_file"
         return 1
     fi
-    validate_certificate "$domain"
+    validate_certificate "$domain" || return 1
+    normalize_certbot_renewal_config "$domain"
 }
 
 ### Check certificate exists ###
@@ -214,6 +218,170 @@ validate_certificate() {
             msg_err "SSL certificate is missing or expired for $domain"
             return 1
         }
+}
+
+### Check if Certbot renewal config already uses target webroot ###
+certbot_renewal_config_is_normalized() {
+    local domain="$1"
+    local renewal_file="$2"
+    local webroot="/var/www/letsencrypt"
+    awk -v domain="$domain" -v webroot="$webroot" '
+        function trim(value) {
+            gsub(/^[ \t]+|[ \t]+$/, "", value)
+            return value
+        }
+        BEGIN {
+            authenticator_ok = 0
+            webroot_path_ok = 0
+            webroot_map_ok = 0
+            in_webroot_map = 0
+        }
+        /^[[:space:]]*\[\[webroot_map\]\][[:space:]]*$/ {
+            in_webroot_map = 1
+            next
+        }
+        in_webroot_map && /^[[:space:]]*\[/ {
+            in_webroot_map = 0
+        }
+        /^[[:space:]]*authenticator[[:space:]]*=/ {
+            value = $0
+            sub(/^[^=]*=/, "", value)
+            value = trim(value)
+            if (value == "webroot") {
+                authenticator_ok = 1
+            }
+        }
+        /^[[:space:]]*webroot_path[[:space:]]*=/ {
+            value = $0
+            sub(/^[^=]*=/, "", value)
+            value = trim(value)
+            if (value == webroot) {
+                webroot_path_ok = 1
+            }
+        }
+        in_webroot_map && /^[[:space:]]*[^#[:space:]][^=]*=/ {
+            key = $0
+            sub(/[[:space:]]*=.*/, "", key)
+            key = trim(key)
+            value = $0
+            sub(/^[^=]*=/, "", value)
+            value = trim(value)
+            if (key == domain && value == webroot) {
+                webroot_map_ok = 1
+            }
+        }
+        END {
+            if (authenticator_ok && webroot_path_ok && webroot_map_ok) {
+                exit 0
+            }
+            exit 1
+        }
+    ' "$renewal_file"
+}
+
+### Normalize existing Certbot renewal config to webroot ###
+normalize_certbot_renewal_config() {
+    local domain="$1"
+    local renewal_file="/etc/letsencrypt/renewal/${domain}.conf"
+    local webroot="/var/www/letsencrypt"
+    local backup_dir
+    local backup_file
+    local tmp_file
+    if [[ ! -f "$renewal_file" ]]; then
+        msg_inf "Certbot renewal config:" "missing for $domain; skipping normalization"
+        return 0
+    fi
+    if certbot_renewal_config_is_normalized "$domain" "$renewal_file"; then
+        return 0
+    fi
+    backup_dir="/root/3x-ui-installer-renewal-backups/$(date +%Y%m%d-%H%M%S)"
+    backup_file="${backup_dir}/${domain}.conf"
+    mkdir -p "$backup_dir"
+    cp -a "$renewal_file" "$backup_file"
+    tmp_file="$(mktemp)"
+    awk -v domain="$domain" -v webroot="$webroot" '
+        BEGIN {
+            in_renewalparams = 0
+            in_webroot_map = 0
+            seen_renewalparams = 0
+            printed_authenticator = 0
+            printed_webroot_path = 0
+            printed_webroot_map = 0
+        }
+        function print_missing_renewalparams() {
+            if (!seen_renewalparams) {
+                print ""
+                print "[renewalparams]"
+                seen_renewalparams = 1
+                in_renewalparams = 1
+            }
+            if (!printed_authenticator) {
+                print "authenticator = webroot"
+                printed_authenticator = 1
+            }
+            if (!printed_webroot_path) {
+                print "webroot_path = " webroot
+                printed_webroot_path = 1
+            }
+        }
+        function print_webroot_map() {
+            print_missing_renewalparams()
+            if (!printed_webroot_map) {
+                print ""
+                print "[[webroot_map]]"
+                print domain " = " webroot
+                printed_webroot_map = 1
+            }
+        }
+        /^[[:space:]]*\[\[webroot_map\]\][[:space:]]*$/ {
+            print_webroot_map()
+            in_webroot_map = 1
+            next
+        }
+        in_webroot_map {
+            if ($0 ~ /^[[:space:]]*\[/) {
+                in_webroot_map = 0
+            } else {
+                next
+            }
+        }
+        /^[[:space:]]*\[renewalparams\][[:space:]]*$/ {
+            print
+            in_renewalparams = 1
+            seen_renewalparams = 1
+            next
+        }
+        in_renewalparams && /^[[:space:]]*\[/ {
+            print_missing_renewalparams()
+            in_renewalparams = 0
+        }
+        in_renewalparams && /^[[:space:]]*authenticator[[:space:]]*=/ {
+            print "authenticator = webroot"
+            printed_authenticator = 1
+            next
+        }
+        in_renewalparams && /^[[:space:]]*webroot_path[[:space:]]*=/ {
+            print "webroot_path = " webroot
+            printed_webroot_path = 1
+            next
+        }
+        {
+            print
+        }
+        END {
+            if (in_renewalparams) {
+                print_missing_renewalparams()
+            }
+            if (!printed_webroot_map) {
+                print_webroot_map()
+            }
+        }
+    ' "$renewal_file" > "$tmp_file"
+    chown --reference="$renewal_file" "$tmp_file" 2>/dev/null || true
+    chmod --reference="$renewal_file" "$tmp_file" 2>/dev/null || true
+    mv "$tmp_file" "$renewal_file"
+    msg_inf "Certbot renewal config:" "normalized for $domain"
+    msg_inf "Renewal backup:" "$backup_file"
 }
 
 ### Request SSL certificates ###
