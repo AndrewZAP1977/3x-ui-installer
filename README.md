@@ -540,7 +540,7 @@ Auto-domain mode generates temporary domains using the public third-party `cdn-o
 x-<IPv4-with-dashes>.cdn-one.org
 ```
 
-This pattern is also known from public x-ui-pro/mozaroc-style auto-domain examples (https://github.com/mozaroc/x-ui-pro), but this installer project does not claim ownership or operational control over `cdn-one.org`.
+This pattern is also known from public x-ui-pro / mozaroc-style auto-domain examples (https://github.com/mozaroc/x-ui-pro), but this installer project does not claim ownership, authorship, permission, or operational control over `cdn-one.org`.
 
 This installer project does not control the `cdn-one.org` domain or its DNS infrastructure.
 
