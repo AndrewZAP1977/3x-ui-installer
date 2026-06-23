@@ -331,7 +331,7 @@ Use this profile if you want XHTTP REALITY to have its own public domain and SNI
 | `-domain`, `--domain DOMAIN`                 | Panel domain.                                              |
 | `-reality-domain`, `--reality-domain DOMAIN` | TCP REALITY domain. In the `standard` profile, this domain also carries the XHTTP inbound. |
 | `-xhttp-domain`, `--xhttp-domain DOMAIN` | XHTTP REALITY domain for the `separate-xhttp-sni` profile. Must be different from panel and reality domains. |
-| `-auto-domain`, `--auto-domain`              | Generate domains automatically using the predefined maintainer-controlled zone. In the `separate-xhttp-sni` profile, this also generates the XHTTP domain. |
+| `-auto-domain`, `--auto-domain`              | Generate temporary domains automatically using third-party `cdn-one.org` DNS. Intended only for testing, disposable VPS deployments, and quick experiments. In the `separate-xhttp-sni` profile, this also generates the XHTTP domain. |
 | `-xui-version`, `--xui-version VERSION`      | 3x-ui version to install. Default: `latest`.               |
 | `-uninstall`, `--uninstall`                  | Remove installed components, generated files, and installer directory. |
 
