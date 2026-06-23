@@ -85,7 +85,11 @@ generate_runtime_variables() {
     done
     PANEL_PATH=$(gen_random_string 10)
     SUB_PATH=$(gen_random_string 10)
-    XHTTP_PATH=$(gen_random_string 10)
+    if [[ "$INSTALL_PROFILE" == "separate-xhttp-sni" ]]; then
+        XHTTP_PATH=",/api/ver1/date,/logos/logo_img/png"
+    else
+        XHTTP_PATH=$(gen_random_string 10)
+    fi
     XHTTP_SOCKET="/dev/shm/xui-$(gen_random_string 6).sock"
 }
 
