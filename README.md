@@ -33,7 +33,7 @@ If you need a universal proxy management stack with many client profiles, extra 
 
 Bash installer for a clean 3x-ui VPS setup with:
 
-* 3x-ui by MHSanaei
+* 3x-ui by MHSanaei https://github.com/MHSanaei/3x-ui
 * Nginx SNI stream routing
 * selectable installation profiles
 * VLESS + TCP + REALITY inbound
