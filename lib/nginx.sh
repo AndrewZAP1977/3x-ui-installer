@@ -124,6 +124,31 @@ enable_tls_configs() {
     fi
 }
 
+### Check whether nginx supports standalone "http2 on;" directive ###
+nginx_supports_http2_on_directive() {
+    local raw_version
+    local major
+    local minor
+    local patch
+    raw_version="$(nginx -v 2>&1 || true)"
+    if [[ ! "$raw_version" =~ nginx/([0-9]+)\.([0-9]+)(\.([0-9]+))? ]]; then
+        return 1
+    fi
+    major="${BASH_REMATCH[1]}"
+    minor="${BASH_REMATCH[2]}"
+    patch="${BASH_REMATCH[4]:-0}"
+    if (( major > 1 )); then
+        return 0
+    fi
+    if (( major == 1 && minor > 25 )); then
+        return 0
+    fi
+    if (( major == 1 && minor == 25 && patch >= 1 )); then
+        return 0
+    fi
+    return 1
+}
+
 ### Render template file ###
 render_template() {
     local template_file="$1"
@@ -131,10 +156,25 @@ render_template() {
     local xhttp_server_name=""
     local xhttp_stream_map=""
     local xhttp_stream_upstream=""
+    local panel_listen_directive
+    local reality_listen_directive
+    local xhttp_listen_directive
+    local http2_directive
     if [[ "$INSTALL_PROFILE" == "separate-xhttp-sni" ]]; then
         xhttp_server_name=" ${XHTTP_DOMAIN}"
         xhttp_stream_map="${XHTTP_DOMAIN}  xray2;"
         xhttp_stream_upstream="upstream xray2 { server 127.0.0.1:8444; }"
+    fi
+    if nginx_supports_http2_on_directive; then
+        panel_listen_directive="listen 127.0.0.1:7443 ssl proxy_protocol;"
+        reality_listen_directive="listen 127.0.0.1:9443 ssl;"
+        xhttp_listen_directive="listen 127.0.0.1:9444 ssl;"
+        http2_directive="    http2 on;"
+    else
+        panel_listen_directive="listen 127.0.0.1:7443 ssl http2 proxy_protocol;"
+        reality_listen_directive="listen 127.0.0.1:9443 ssl http2;"
+        xhttp_listen_directive="listen 127.0.0.1:9444 ssl http2;"
+        http2_directive=""
     fi
     sed \
         -e "s|{{DOMAIN}}|$DOMAIN|g" \
@@ -143,6 +183,10 @@ render_template() {
         -e "s|{{XHTTP_SERVER_NAME}}|$xhttp_server_name|g" \
         -e "s|{{XHTTP_STREAM_MAP}}|$xhttp_stream_map|g" \
         -e "s|{{XHTTP_STREAM_UPSTREAM}}|$xhttp_stream_upstream|g" \
+        -e "s|{{PANEL_LISTEN_DIRECTIVE}}|$panel_listen_directive|g" \
+        -e "s|{{REALITY_LISTEN_DIRECTIVE}}|$reality_listen_directive|g" \
+        -e "s|{{XHTTP_LISTEN_DIRECTIVE}}|$xhttp_listen_directive|g" \
+        -e "s|{{HTTP2_DIRECTIVE}}|$http2_directive|g" \
         -e "s|{{PANEL_PORT}}|$PANEL_PORT|g" \
         -e "s|{{PANEL_PATH}}|$PANEL_PATH|g" \
         -e "s|{{SUB_PORT}}|$SUB_PORT|g" \
