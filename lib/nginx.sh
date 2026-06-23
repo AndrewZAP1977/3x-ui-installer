@@ -447,8 +447,7 @@ normalize_certbot_renewal_config() {
     chown --reference="$renewal_file" "$tmp_file" 2>/dev/null || true
     chmod --reference="$renewal_file" "$tmp_file" 2>/dev/null || true
     mv "$tmp_file" "$renewal_file"
-    msg_inf "Certbot renewal config:" "normalized for $domain"
-    msg_inf "Renewal backup:" "$backup_file"
+    msg_inf "Certbot renewal config:" "normalized for $domain; backup saved"
 }
 
 ### Request SSL certificates ###
