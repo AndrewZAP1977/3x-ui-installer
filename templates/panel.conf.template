@@ -3,8 +3,8 @@ server
     server_tokens off;
     server_name {{DOMAIN}};
 
-    listen 127.0.0.1:7443 ssl proxy_protocol;
-    http2 on;
+    {{PANEL_LISTEN_DIRECTIVE}}
+{{HTTP2_DIRECTIVE}}
 
     root {{FAKESITE1_ROOT}};
     index index.html index.htm index.php index.nginx-debian.html;
