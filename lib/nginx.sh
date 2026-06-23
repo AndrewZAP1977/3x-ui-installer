@@ -66,13 +66,17 @@ render_nginx_templates() {
     render_template \
         "${SCRIPT_DIR}/templates/panel_includes.conf.template" \
         "/etc/nginx/snippets/panel_includes.conf"
-    render_template \
-        "${SCRIPT_DIR}/templates/reality_includes.conf.template" \
-        "/etc/nginx/snippets/reality_includes.conf"
     if [[ "$INSTALL_PROFILE" == "separate-xhttp-sni" ]]; then
         render_template \
-            "${SCRIPT_DIR}/templates/xhttp_includes.conf.template" \
+            "${SCRIPT_DIR}/templates/fake_site_includes.conf.template" \
+            "/etc/nginx/snippets/reality_includes.conf"
+        render_template \
+            "${SCRIPT_DIR}/templates/fake_site_includes.conf.template" \
             "/etc/nginx/snippets/xhttp_includes.conf"
+    else
+        render_template \
+            "${SCRIPT_DIR}/templates/reality_includes.conf.template" \
+            "/etc/nginx/snippets/reality_includes.conf"
     fi
     render_template \
         "${SCRIPT_DIR}/templates/nginx.conf.template" \

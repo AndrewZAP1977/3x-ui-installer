@@ -1,0 +1,9 @@
+location ~* \.(css|js|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot|map)$
+{
+    try_files $uri =404;
+}
+
+location /
+{
+    try_files $uri $uri/ /index.html;
+}
