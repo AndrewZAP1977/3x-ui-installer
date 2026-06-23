@@ -245,8 +245,11 @@ bash <(curl -fsSL https://raw.githubusercontent.com/AndrewZAP1977/3x-ui-installe
     --auto-domain
 ```
 
-`--auto-domain` uses a predefined maintainer-controlled domain zone.
-It is intended for private/controlled deployments, not as a universal public install mode.
+`--auto-domain` uses the public third-party `cdn-one.org` wildcard DNS pattern.
+This domain is not controlled by this installer project.
+
+Auto-domain mode is intended for testing, disposable VPS deployments, and quick experiments.
+For long-lived or production installations, use your own domains.
 
 For the `standard` profile, `--auto-domain` generates two domains.
 
@@ -523,6 +526,31 @@ If a smoke check fails, the installer stops and prints the failed check.
 <summary><strong>Notes</strong></summary>
 
 ## Notes
+
+<details>
+<summary><strong>Auto-domain mode</strong></summary>
+
+## Auto-domain mode
+
+Auto-domain mode generates temporary domains using the public third-party `cdn-one.org` wildcard DNS pattern:
+
+```text
+<IPv4>.cdn-one.org
+<IPv4-with-dashes>.cdn-one.org
+x-<IPv4-with-dashes>.cdn-one.org
+```
+
+This pattern is also known from public x-ui-pro/mozaroc-style auto-domain examples (https://github.com/mozaroc/x-ui-pro), but this installer project does not claim ownership or operational control over `cdn-one.org`.
+
+This installer project does not control the `cdn-one.org` domain or its DNS infrastructure.
+
+Availability, DNS behavior, and certificate issuance reliability depend on the third-party `cdn-one.org` domain and its current DNS setup.
+
+Use auto-domain mode only for testing, disposable VPS deployments, and quick experiments.
+
+For long-lived or production installations, use your own domains.
+
+</details>
 
 <details>
 <summary><strong>XHTTP transport note</strong></summary>
