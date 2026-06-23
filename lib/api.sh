@@ -242,7 +242,7 @@ api_create_reality_inbound() {
                     ],
                     \"settings\": {
                         \"publicKey\": \"${PUBLIC_KEY}\",
-                        \"fingerprint\": \"random\",
+                        \"fingerprint\": \"firefox\",
                         \"serverName\": \"\",
                         \"spiderX\": \"/\",
                         \"mldsa65Verify\": \"\"
@@ -450,7 +450,7 @@ api_create_xhttp_reality_inbound() {
                     \"mldsa65Seed\": \"\",
                     \"settings\": {
                         \"publicKey\": \"${PUBLIC_KEY}\",
-                        \"fingerprint\": \"random\",
+                        \"fingerprint\": \"firefox\",
                         \"serverName\": \"\",
                         \"spiderX\": \"/\",
                         \"mldsa65Verify\": \"\"
