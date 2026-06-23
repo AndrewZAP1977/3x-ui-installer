@@ -476,7 +476,10 @@ api_create_xhttp_reality_inbound() {
                     \"tcpKeepAliveIdle\": 300,
                     \"tcpUserTimeout\": 20000,
                     \"tcpcongestion\": \"bbr\",
-                    \"tcpWindowClamp\": 600
+                    \"tcpWindowClamp\": 600,
+                    \"trustedXForwardedFor\": [
+                        \"127.0.0.1\"
+                    ]
                 }
             },
             \"sniffing\": {

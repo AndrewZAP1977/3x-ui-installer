@@ -199,6 +199,21 @@ Recommended backup items:
 
 </details>
 
+<details>
+<summary><strong>Minimal Debian prerequisites</strong></summary>
+
+### Minimal Debian prerequisites
+
+On a minimal Debian installation, `curl` may not be installed by default.
+
+Install `curl` and CA certificates first:
+
+```bash
+apt update && apt install -y curl ca-certificates
+```
+
+</details>
+
 Recommended one-command install:
 
 ```bash
