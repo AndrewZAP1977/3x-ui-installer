@@ -544,6 +544,31 @@ The XHTTP REALITY client flow is intentionally empty.
 </details>
 
 <details>
+<summary><strong>Let's Encrypt renewal configs</strong></summary>
+
+## Let's Encrypt renewal configs
+
+The installer uses Certbot webroot HTTP-01 validation with:
+
+```text
+/var/www/letsencrypt
+```
+
+If an existing Let's Encrypt certificate is reused, the installer checks the matching Certbot renewal config for the current installation domain.
+
+If an older standalone, nginx, or non-target webroot renewal config is found, it is rewritten to the installer target webroot scheme and backed up first.
+
+Backups are stored under:
+
+```text
+/root/3x-ui-installer-renewal-backups/
+```
+
+Only renewal configs for domains used by the current installation are touched.
+
+</details>
+
+<details>
 <summary><strong>Security notes</strong></summary>
 
 ## Security notes
