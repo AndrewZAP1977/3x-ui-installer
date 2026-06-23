@@ -178,6 +178,8 @@ check_pattern_present "templates/stream.conf.template" 'proxy_timeout' "stream t
 check_pattern_present "templates/stream.conf.template" 'proxy_connect_timeout' "stream template contains proxy_connect_timeout"
 check_pattern_present "templates/stream.conf.template" 'tcp_nodelay' "stream template contains tcp_nodelay"
 check_pattern_present "lib/api.sh" 'trustedXForwardedFor' "api.sh configures XHTTP trustedXForwardedFor"
+check_pattern_present "lib/api.sh" '"fingerprint": "firefox"' "api.sh uses explicit Firefox Reality fingerprint"
+check_pattern_absent "lib/api.sh" '"fingerprint": "random"' "api.sh does not use random Reality fingerprint"
 check_pattern_present "lib/runtime.sh" 'separate-xhttp-sni' "runtime.sh handles profile-specific XHTTP path"
 check_pattern_present "lib/runtime.sh" ',/api/ver1/date,/logos/logo_img/png' "runtime.sh uses human-looking XHTTP path for separate-xhttp-sni"
 check_pattern_present "lib/nginx.sh" 'fake_site_includes\.conf\.template' "nginx.sh renders fake-site-only includes for profile-specific snippets"
