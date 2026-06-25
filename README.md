@@ -2,7 +2,7 @@
 
 ## Project scope and operational boundaries
 
-This project was created primarily for my own use and is published as-is.
+This project was created primarily for my own use, around my specific needs and setup, and is published as-is.
 
 It is focused on one narrow 3x-ui installer workflow, not on becoming a universal proxy management stack, a full panel replacement, or a general support product.
 
