@@ -268,16 +268,22 @@ maybe_setup_xui_fail2ban() {
             && systemctl is-active --quiet fail2ban 2>/dev/null \
             && fail2ban-client status 3x-ipl >/dev/null 2>&1; then
             rm -f "${setup_log}"
+            msg_blank
             msg_ok "Fail2ban/IP Limit installed and configured."
+            msg_blank
         else
+            msg_blank
             msg_warn "Fail2ban setup finished, but verification failed."
             msg_warn "Check manually with: fail2ban-client status 3x-ipl"
             msg_warn "Setup log: ${setup_log}"
+            msg_blank
         fi
     else
+        msg_blank
         msg_warn "Fail2ban setup failed. Continuing without Fail2ban."
         msg_warn "Setup log: ${setup_log}"
         msg_warn "You can retry later with: x-ui setup-fail2ban"
+        msg_blank
     fi
     return 0
 }
