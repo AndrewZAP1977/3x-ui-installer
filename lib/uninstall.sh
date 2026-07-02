@@ -12,6 +12,9 @@ readonly UNINSTALL_PURGE_PACKAGES=(
     bind9-host
     bind9-libs
     ufw
+    fail2ban
+    nftables
+    python3-systemd
     jq
     unzip
     wget
@@ -37,6 +40,7 @@ This will remove components installed by this project:
 - Certbot webroot challenge files
 - Nginx and Certbot packages
 - UFW rules and UFW package
+- Fail2ban service, 3x-ui IP Limit jail files, and related packages
 - installer temporary files and generated leftovers
 - downloaded installer directory
 
@@ -175,6 +179,21 @@ uninstall_firewall() {
     msg_ok "Firewall reset"
 }
 
+### Remove Fail2ban / 3x-ui IP Limit integration ###
+uninstall_fail2ban() {
+    msg_inf "Removing Fail2ban/IP Limit integration..."
+    if systemctl list-unit-files fail2ban.service >/dev/null 2>&1; then
+        stop_disable_service "fail2ban"
+    fi
+    remove_path "/etc/fail2ban/jail.d/3x-ipl.conf"
+    remove_path "/etc/fail2ban/filter.d/3x-ipl.conf"
+    remove_path "/etc/fail2ban/action.d/3x-ipl.conf"
+    remove_path "/var/log/fail2ban.log"
+    remove_path "/var/log/fail2ban.log.1"
+    remove_path "/var/run/fail2ban"
+    msg_ok "Fail2ban/IP Limit integration removed"
+}
+
 ### Remove packages ###
 uninstall_packages() {
     msg_inf "Removing packages..."
@@ -206,6 +225,7 @@ run_uninstall() {
     uninstall_fake_sites
     uninstall_runtime_leftovers
     uninstall_firewall
+    uninstall_fail2ban
     uninstall_packages
     uninstall_installer_files
     msg_blank

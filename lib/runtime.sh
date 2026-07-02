@@ -335,7 +335,6 @@ run_smoke_checks() {
         "$DOMAIN" \
         "${SUB_URI}${CLIENT_SUB_ID}"
     msg_ok "Smoke checks passed"
-    msg_blank
 }
 
 ### Clear All ###
