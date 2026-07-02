@@ -173,6 +173,7 @@ validate_nginx
 prepare_fake_sites
 reload_nginx
 run_smoke_checks
+maybe_setup_xui_fail2ban || msg_inf "Optional Fail2ban/IP Limit setup did not complete"
 msg_ok "Installation completed successfully !!!"
 echo
 wait_before_summary
