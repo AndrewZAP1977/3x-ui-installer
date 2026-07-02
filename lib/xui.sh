@@ -227,14 +227,18 @@ maybe_setup_xui_fail2ban() {
         yes|YES|y|Y|true|TRUE|1)
             ;;
         no|NO|n|N|false|FALSE|0)
+            msg_blank
             msg_inf "Skipping Fail2ban/IP Limit setup."
             msg_inf "You can enable it later with: x-ui setup-fail2ban"
+            msg_blank
             return 0
             ;;
         ask)
             if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then
+                msg_blank
                 msg_inf "Skipping Fail2ban/IP Limit setup."
                 msg_inf "You can enable it later with: x-ui setup-fail2ban"
+                msg_blank
                 return 0
             fi
             printf "\e[1;33mInstall and configure Fail2ban for 3x-ui IP Limit now? [y/N]: \e[0m" >/dev/tty
@@ -243,8 +247,10 @@ maybe_setup_xui_fail2ban() {
                 y|Y|yes|YES)
                     ;;
                 *)
+                    msg_blank
                     msg_inf "Skipping Fail2ban/IP Limit setup."
                     msg_inf "You can enable it later with: x-ui setup-fail2ban"
+                    msg_blank
                     return 0
                     ;;
             esac
