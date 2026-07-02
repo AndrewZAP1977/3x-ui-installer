@@ -7,6 +7,9 @@ msg_ok() {
 msg_err() {
     echo -e "\e[1;31m $1 \e[0m"
 }
+msg_warn() {
+    printf "\e[1;33m %-38s %s\e[0m\n" "$1" "$2"
+}
 msg_inf() {
     printf "\e[1;36m %-38s %s\e[0m\n" "$1" "$2"
 }
