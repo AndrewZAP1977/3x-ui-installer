@@ -123,6 +123,7 @@ uninstall_xui_files() {
     remove_path "/var/lib/x-ui"
     systemctl daemon-reload 2>/dev/null || true
     msg_ok "3x-ui files removed"
+    msg_blank
 }
 
 ### Remove Nginx generated files ###
@@ -135,6 +136,7 @@ uninstall_nginx_files() {
     remove_path "/var/lib/nginx"
     remove_path "/run/nginx.pid"
     msg_ok "Nginx files removed"
+    msg_blank
 }
 
 ### Remove Certbot webroot files ###
@@ -142,6 +144,7 @@ uninstall_certbot_files() {
     msg_inf "Removing Certbot webroot files..."
     remove_path "/var/www/letsencrypt"
     msg_ok "Certbot webroot files removed"
+    msg_blank
 }
 
 ### Remove fake sites ###
@@ -156,6 +159,7 @@ uninstall_fake_sites() {
     remove_path "/tmp/randomfakehtml.zip"
     remove_path "/tmp/randomfakehtml-master"
     msg_ok "Fake sites removed"
+    msg_blank
 }
 
 ### Remove temporary runtime leftovers ###
@@ -167,6 +171,7 @@ uninstall_runtime_leftovers() {
         -name 'xui-*.sock' \
         -delete 2>/dev/null || true
     msg_ok "Runtime leftovers removed"
+    msg_blank
 }
 
 ### Reset firewall ###
@@ -177,6 +182,7 @@ uninstall_firewall() {
         ufw --force disable >/dev/null 2>&1 || true
     fi
     msg_ok "Firewall reset"
+    msg_blank
 }
 
 ### Remove Fail2ban / 3x-ui IP Limit integration ###
@@ -192,6 +198,7 @@ uninstall_fail2ban() {
     remove_path "/var/log/fail2ban.log.1"
     remove_path "/var/run/fail2ban"
     msg_ok "Fail2ban/IP Limit integration removed"
+    msg_blank
 }
 
 ### Remove packages ###
@@ -212,6 +219,7 @@ uninstall_packages() {
     DEBIAN_FRONTEND=noninteractive apt-get autoclean -y \
         >/dev/null 2>&1 || true
     msg_ok "Packages removed"
+    msg_blank
 }
 
 ### Run uninstall ###
