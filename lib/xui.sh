@@ -189,7 +189,6 @@ cleanup_previous_database() {
 ### Optional Fail2ban / IP Limit setup ###
 maybe_setup_xui_fail2ban() {
     msg_blank
-    msg_inf "Checking optional 3x-ui Fail2ban / IP Limit integration..."
     if ! command -v x-ui >/dev/null 2>&1; then
         msg_warn "x-ui CLI not found; skipping Fail2ban/IP Limit setup."
         return 0
@@ -198,6 +197,8 @@ maybe_setup_xui_fail2ban() {
     local f2b_active=0
     local jail_ready=0
     local mode=""
+    local answer=""
+    local setup_log=""
     if command -v fail2ban-client >/dev/null 2>&1; then
         f2b_installed=1
     fi
@@ -211,7 +212,7 @@ maybe_setup_xui_fail2ban() {
     if [[ "${f2b_installed}" == "1" \
         && "${f2b_active}" == "1" \
         && "${jail_ready}" == "1" ]]; then
-        msg_ok "Fail2ban is already installed and 3x-ipl jail is configured."
+        msg_ok "Fail2ban/IP Limit already configured."
         return 0
     fi
     mode="${XUI_INSTALLER_FAIL2BAN:-}"
@@ -232,28 +233,12 @@ maybe_setup_xui_fail2ban() {
             ;;
         ask)
             if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then
-                msg_inf "No interactive terminal available; skipping Fail2ban/IP Limit setup."
+                msg_inf "Skipping Fail2ban/IP Limit setup."
                 msg_inf "You can enable it later with: x-ui setup-fail2ban"
                 return 0
             fi
-            echo
-            echo "3x-ui IP Limit can use Fail2ban for real IP-limit enforcement."
-            echo
-            echo "Current status:"
-            echo "  fail2ban installed: $([[ "${f2b_installed}" == "1" ]] && echo yes || echo no)"
-            echo "  fail2ban active:    $([[ "${f2b_active}" == "1" ]] && echo yes || echo no)"
-            echo "  3x-ipl jail ready:  $([[ "${jail_ready}" == "1" ]] && echo yes || echo no)"
-            echo
-            echo "You can install/configure it now, or later with:"
-            echo
-            echo "  x-ui setup-fail2ban"
-            echo
-            echo "You can also manage IP Limit from the x-ui menu:"
-            echo
-            echo "  x-ui"
-            echo
-            local answer=""
-            read -r -p "Install and configure Fail2ban for 3x-ui IP Limit now? [y/N]: " answer </dev/tty || answer=""
+            printf "\e[1;33mInstall and configure Fail2ban for 3x-ui IP Limit now? [y/N]: \e[0m" >/dev/tty
+            read -r answer </dev/tty || answer=""
             case "${answer}" in
                 y|Y|yes|YES)
                     ;;
@@ -270,19 +255,22 @@ maybe_setup_xui_fail2ban() {
             return 0
             ;;
     esac
-    msg_inf "Running: x-ui setup-fail2ban"
-    if x-ui setup-fail2ban; then
+    setup_log="$(mktemp /tmp/xui-fail2ban-setup.XXXXXX.log)"
+    if x-ui setup-fail2ban >"${setup_log}" 2>&1; then
         if command -v fail2ban-client >/dev/null 2>&1 \
             && fail2ban-client -t >/dev/null 2>&1 \
             && systemctl is-active --quiet fail2ban 2>/dev/null \
             && fail2ban-client status 3x-ipl >/dev/null 2>&1; then
-            msg_ok "Fail2ban/IP Limit integration configured successfully."
+            rm -f "${setup_log}"
+            msg_ok "Fail2ban/IP Limit installed and configured."
         else
-            msg_warn "Fail2ban setup finished, but verification was not fully successful."
+            msg_warn "Fail2ban setup finished, but verification failed."
             msg_warn "Check manually with: fail2ban-client status 3x-ipl"
+            msg_warn "Setup log: ${setup_log}"
         fi
     else
         msg_warn "Fail2ban setup failed. Continuing without Fail2ban."
+        msg_warn "Setup log: ${setup_log}"
         msg_warn "You can retry later with: x-ui setup-fail2ban"
     fi
     return 0
