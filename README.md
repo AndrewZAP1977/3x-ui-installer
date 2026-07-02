@@ -42,6 +42,7 @@ Bash installer for a clean 3x-ui VPS setup with:
 * subscription endpoint
 * fake fallback sites
 * post-install smoke checks
+* optional Fail2ban setup for 3x-ui IP Limit integration
 * full uninstall mode for clean VPS rollback
 
 The installer supports only **3x-ui v3.0.0 and newer**.
@@ -348,6 +349,43 @@ Versions below v3 are blocked intentionally because older 3x-ui releases use dif
 </details>
 
 <details>
+<summary><strong>Optional Fail2ban / IP Limit setup</strong></summary>
+
+## Optional Fail2ban / IP Limit setup
+
+At the end of an interactive installation, the installer asks whether to install and configure Fail2ban for the 3x-ui IP Limit feature.
+
+If selected, the installer runs the official 3x-ui command: `x-ui setup-fail2ban`.
+
+The setup is optional. The main 3x-ui, Nginx, REALITY, XHTTP, subscription, and fake-site deployment does not depend on Fail2ban.
+
+If Fail2ban and the `3x-ipl` jail are already installed and active, the installer detects this and does not ask again.
+
+For non-interactive usage, the behavior can be controlled with `XUI_INSTALLER_FAIL2BAN`:
+
+| Value | Behavior |
+| ----- | -------- |
+| `ask` | Ask when an interactive terminal is available. |
+| `yes` | Install and configure Fail2ban without asking. |
+| `no` | Skip Fail2ban setup. |
+
+Examples:
+
+`XUI_INSTALLER_FAIL2BAN=yes bash <(curl -fsSL https://raw.githubusercontent.com/AndrewZAP1977/3x-ui-installer/main/install.sh)`
+
+`XUI_INSTALLER_FAIL2BAN=no bash <(curl -fsSL https://raw.githubusercontent.com/AndrewZAP1977/3x-ui-installer/main/install.sh)`
+
+Fail2ban/IP Limit can also be installed later from the server terminal:
+
+`x-ui setup-fail2ban`
+
+or through the 3x-ui CLI menu:
+
+`x-ui`
+
+</details>
+
+<details>
 <summary><strong>What the installer creates</strong></summary>
 
 ## What the installer creates
@@ -361,6 +399,7 @@ The installer creates:
 * subscription endpoint
 * Nginx SNI stream routing
 * fake websites for all public domains used by the selected profile
+* optional Fail2ban / 3x-ui IP Limit integration when selected
 
 At the end, the installer prints:
 
@@ -441,6 +480,7 @@ It removes:
 * Nginx package and configuration
 * Certbot package
 * UFW rules and UFW package
+* Fail2ban service, 3x-ui IP Limit jail files, and related packages
 * generated runtime leftovers
 * installer-created temporary files
 * downloaded installer directory
