@@ -190,7 +190,9 @@ cleanup_previous_database() {
 maybe_setup_xui_fail2ban() {
     msg_blank
     if ! command -v x-ui >/dev/null 2>&1; then
+        msg_blank
         msg_warn "x-ui CLI not found; skipping Fail2ban/IP Limit setup."
+        msg_blank
         return 0
     fi
     local f2b_installed=0
@@ -212,7 +214,9 @@ maybe_setup_xui_fail2ban() {
     if [[ "${f2b_installed}" == "1" \
         && "${f2b_active}" == "1" \
         && "${jail_ready}" == "1" ]]; then
+        msg_blank
         msg_ok "Fail2ban/IP Limit already configured."
+        msg_blank
         return 0
     fi
     mode="${XUI_INSTALLER_FAIL2BAN:-}"
@@ -256,8 +260,10 @@ maybe_setup_xui_fail2ban() {
             esac
             ;;
         *)
+            msg_blank
             msg_warn "Unknown XUI_INSTALLER_FAIL2BAN='${mode}', skipping Fail2ban setup."
             msg_inf "Use XUI_INSTALLER_FAIL2BAN=yes to enable it automatically."
+            msg_blank
             return 0
             ;;
     esac
