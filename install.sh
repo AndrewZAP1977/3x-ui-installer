@@ -165,14 +165,6 @@ api_login
 api_update_xray_routing
 api_create_reality_inbound
 api_create_xhttp_inbound
-msg_inf "Applying REALITY client compatibility..."
-sqlite3 /etc/x-ui/x-ui.db "
-UPDATE inbounds
-SET stream_settings = json_set(stream_settings, '$.realitySettings.minClientVer', '1.8.1')
-WHERE json_extract(stream_settings, '$.security') = 'reality';
-"
-msg_ok "REALITY min client version set to 1.8.1"
-msg_blank
 restart_xui
 wait_xui_ready
 render_nginx_templates

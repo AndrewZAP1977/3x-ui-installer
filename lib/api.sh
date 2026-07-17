@@ -226,7 +226,7 @@ api_create_reality_inbound() {
                         \"${REALITY_DOMAIN}\"
                     ],
                     \"privateKey\": \"${PRIVATE_KEY}\",
-                    \"minClientVer\": \"\",
+                    \"minClientVer\": \"1.8.1\",
                     \"maxClientVer\": \"\",
                     \"maxTimediff\": 0,
                     \"mldsa65Seed\": \"\",
@@ -434,7 +434,7 @@ api_create_xhttp_reality_inbound() {
                         \"${XHTTP_DOMAIN}\"
                     ],
                     \"privateKey\": \"${PRIVATE_KEY}\",
-                    \"minClientVer\": \"\",
+                    \"minClientVer\": \"1.8.1\",
                     \"maxClientVer\": \"\",
                     \"maxTimediff\": 0,
                     \"shortIds\": [
