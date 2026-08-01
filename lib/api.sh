@@ -548,6 +548,7 @@ api_update_xui_settings() {
             \"smtpEnabledEvents\":\"\",
             \"smtpCpu\":80,
             \"smtpMemory\":80,
+            \"outboundDownThreshold\":3,
             \"timeLocation\":\"Europe/Moscow\",
             \"twoFactorEnable\":false,
             \"twoFactorToken\":\"\",
