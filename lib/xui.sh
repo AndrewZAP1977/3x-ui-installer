@@ -93,6 +93,7 @@ select_xui_version_interactive() {
     local normalized_version=""
     local index
     local list_index
+    clear_all
     if [[ "${XUI_VERSION_USER_SET:-false}" == true ]]; then
         return 0
     fi
