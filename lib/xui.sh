@@ -76,26 +76,12 @@ fetch_xui_release_versions() {
     if [[ -z "${releases_json}" ]]; then
         return 1
     fi
-    printf '%s' "${releases_json}" | jq -r '
-        [
-            .[]
-            | select(.draft != true and .prerelease != true)
-            | .tag_name
-            | select(test("^v?[0-9]+\\.[0-9]+\\.[0-9]+$"))
-            | capture("^v?(?<major>[0-9]+)\\.(?<minor>[0-9]+)\\.(?<patch>[0-9]+)$") as $v
-            | select(($v.major | tonumber) >= 3)
-            | {
-                tag: ("v" + $v.major + "." + $v.minor + "." + $v.patch),
-                major: ($v.major | tonumber),
-                minor: ($v.minor | tonumber),
-                patch: ($v.patch | tonumber)
-            }
-        ]
-        | unique_by(.tag)
-        | sort_by(.major, .minor, .patch)
-        | reverse
-        | .[].tag
-    ' 2>/dev/null
+    printf '%s' "${releases_json}" \
+        | grep -oE '"tag_name"[[:space:]]*:[[:space:]]*"v?[0-9]+\.[0-9]+\.[0-9]+"' \
+        | sed -E 's/.*"v?([0-9]+)\.([0-9]+)\.([0-9]+)".*/v\1.\2.\3/' \
+        | awk -F'[v.]' '$2 >= 3 { print $0 }' \
+        | sort -Vu \
+        | sort -Vr
 }
 
 ### Select x-ui version interactively ###
