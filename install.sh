@@ -121,7 +121,6 @@ source "${SCRIPT_DIR}/lib/system.sh"
 source "${SCRIPT_DIR}/lib/uninstall.sh"
 source "${SCRIPT_DIR}/lib/utils.sh"
 source "${SCRIPT_DIR}/lib/xui.sh"
-source "${SCRIPT_DIR}/lib/releases.sh"
 trap 'on_error "${LINENO}" "${BASH_COMMAND}" "$?"' ERR
 show_help_if_requested "$@"
 require_root
