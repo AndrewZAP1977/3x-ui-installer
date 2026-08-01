@@ -81,13 +81,13 @@ fetch_xui_release_versions() {
         | sed -E 's/.*"v?([0-9]+)\.([0-9]+)\.([0-9]+)".*/v\1.\2.\3/' \
         | awk -F'[v.]' '$2 >= 3 { print $0 }' \
         | sort -Vu \
-        | sort -Vr
+        | sort -Vr \
+        | head -n 15
 }
 
 ### Select x-ui version interactively ###
 select_xui_version_interactive() {
     local versions=()
-    local latest_version=""
     local choice=""
     local manual_version=""
     local normalized_version=""
@@ -107,34 +107,24 @@ select_xui_version_interactive() {
         msg_blank
         return 0
     fi
-    latest_version="${versions[0]}"
     clear_all
     msg_blank
-    printf "\e[1;33mSelect 3x-ui version to install:\e[0m\n" >/dev/tty
-    printf "  1) latest (%s)\n" "${latest_version}" >/dev/tty
-    index=2
+    printf "Select 3x-ui version to install:\n" >/dev/tty
+    index=1
     for list_index in "${!versions[@]}"; do
         printf "  %d) %s\n" "${index}" "${versions[${list_index}]}" >/dev/tty
         ((index++))
     done
     printf "  m) manual version\n" >/dev/tty
     while true; do
-        printf "\e[1;33mChoice [1]: \e[0m" >/dev/tty
+        printf "Choice [1]: " >/dev/tty
         read -r choice </dev/tty || choice=""
         choice="${choice:-1}"
         case "${choice}" in
-            1)
-                XUI_VERSION="latest"
-                export XUI_VERSION
-                msg_blank
-                msg_inf "Selected 3x-ui version:" "latest (${latest_version})"
-                msg_blank
-                return 0
-                ;;
             m|M|manual|MANUAL)
                 while true; do
                     msg_blank
-                    printf "\e[1;33mEnter 3x-ui version, for example v3.6.0: \e[0m" >/dev/tty
+                    printf "Enter 3x-ui version, for example v3.6.0: " >/dev/tty
                     read -r manual_version </dev/tty || manual_version=""
                     normalized_version="$(normalize_xui_version "${manual_version}" 2>/dev/null || true)"
                     if [[ -n "${normalized_version}" ]]; then
@@ -152,8 +142,8 @@ select_xui_version_interactive() {
                 msg_warn "Invalid menu choice:" "${choice}"
                 ;;
             *)
-                if (( choice >= 2 && choice < index )); then
-                    list_index=$((choice - 2))
+                if (( choice >= 1 && choice < index )); then
+                    list_index=$((choice - 1))
                     XUI_VERSION="${versions[${list_index}]}"
                     export XUI_VERSION
                     msg_blank
