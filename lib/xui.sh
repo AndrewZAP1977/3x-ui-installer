@@ -107,7 +107,7 @@ select_xui_version_interactive() {
     local normalized_version=""
     local index
     local list_index
-    if [[ -n "${XUI_VERSION:-}" ]]; then
+    if [[ "${XUI_VERSION_USER_SET:-false}" == true ]]; then
         return 0
     fi
     if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then

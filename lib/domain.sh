@@ -2,6 +2,10 @@
 
 ### Default installer options ###
 AUTO_DOMAIN="${AUTO_DOMAIN:-false}"
+XUI_VERSION_USER_SET="${XUI_VERSION_USER_SET:-false}"
+if [[ -n "${XUI_VERSION:-}" ]]; then
+    XUI_VERSION_USER_SET=true
+fi
 XUI_VERSION="${XUI_VERSION:-latest}"
 UNINSTALL_MODE="${UNINSTALL_MODE:-false}"
 INSTALL_PROFILE="${INSTALL_PROFILE:-}"
@@ -241,6 +245,7 @@ parse_arguments() {
                     exit 1
                 }
                 XUI_VERSION="$2"
+                XUI_VERSION_USER_SET=true
                 shift 2
                 ;;
             *)
