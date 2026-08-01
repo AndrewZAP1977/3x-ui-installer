@@ -109,6 +109,7 @@ select_xui_version_interactive() {
     fi
     latest_version="${versions[0]}"
     clear_all
+    msg_blank
     printf "\e[1;33mSelect 3x-ui version to install:\e[0m\n" >/dev/tty
     printf "  1) latest (%s)\n" "${latest_version}" >/dev/tty
     index=2
@@ -132,6 +133,7 @@ select_xui_version_interactive() {
                 ;;
             m|M|manual|MANUAL)
                 while true; do
+                    msg_blank
                     printf "\e[1;33mEnter 3x-ui version, for example v3.6.0: \e[0m" >/dev/tty
                     read -r manual_version </dev/tty || manual_version=""
                     normalized_version="$(normalize_xui_version "${manual_version}" 2>/dev/null || true)"
