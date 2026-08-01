@@ -93,7 +93,6 @@ select_xui_version_interactive() {
     local normalized_version=""
     local index
     local list_index
-    clear_all
     if [[ "${XUI_VERSION_USER_SET:-false}" == true ]]; then
         return 0
     fi
@@ -109,7 +108,7 @@ select_xui_version_interactive() {
         return 0
     fi
     latest_version="${versions[0]}"
-    msg_blank
+    clear_all
     printf "\e[1;33mSelect 3x-ui version to install:\e[0m\n" >/dev/tty
     printf "  1) latest (%s)\n" "${latest_version}" >/dev/tty
     index=2
