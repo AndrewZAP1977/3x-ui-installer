@@ -126,6 +126,7 @@ show_help_if_requested "$@"
 require_root
 parse_arguments "$@"
 handle_uninstall_mode
+select_xui_version_interactive
 clear_all
 show_install_profile
 msg_inf "Installation started"
@@ -136,7 +137,6 @@ install_packages
 detect_public_ips
 resolve_domains
 validate_domains
-select_xui_version_interactive
 configure_firewall
 generate_runtime_variables
 generate_runtime_uris
