@@ -136,6 +136,7 @@ install_packages
 detect_public_ips
 resolve_domains
 validate_domains
+select_xui_version_interactive
 configure_firewall
 generate_runtime_variables
 generate_runtime_uris
