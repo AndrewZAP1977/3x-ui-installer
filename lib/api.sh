@@ -212,7 +212,7 @@ api_create_reality_inbound() {
                         \"forceTls\": \"same\",
                         \"dest\": \"${DOMAIN}\",
                         \"port\": 443,
-                        \"remark\": \"\",
+                        \"remark\": \"${DOMAIN}\",
                         \"sni\": \"\",
                         \"alpn\": [],
                         \"pinnedPeerCertSha256\": []
@@ -334,7 +334,7 @@ api_create_xhttp_socket_inbound() {
                         \"forceTls\": \"tls\",
                         \"dest\": \"${REALITY_DOMAIN}\",
                         \"port\": 443,
-                        \"remark\": \"\",
+                        \"remark\": \"${REALITY_DOMAIN}\",
                         \"sni\": \"\",
                         \"alpn\": [\"h2\"],
                         \"pinnedPeerCertSha256\": []
@@ -461,7 +461,7 @@ api_create_xhttp_reality_inbound() {
                         \"forceTls\": \"same\",
                         \"dest\": \"${XHTTP_DOMAIN}\",
                         \"port\": 443,
-                        \"remark\": \"\",
+                        \"remark\": \"${XHTTP_DOMAIN}\",
                         \"sni\": \"\",
                         \"alpn\": [],
                         \"pinnedPeerCertSha256\": []
