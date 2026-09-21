@@ -385,3 +385,122 @@ maybe_setup_xui_fail2ban() {
     fi
     return 0
 }
+
+### Optional Podkop-compatible Xray setup ###
+maybe_setup_podkop_xray_compat() {
+    msg_blank
+    local target_version="v26.7.28"
+    local current_version=""
+    local xui_arch=""
+    local xray_binary=""
+    local mode=""
+    local answer=""
+    local response=""
+    local status_response=""
+    local installed_version=""
+    local retries=30
+    xui_arch=$(detect_xui_arch) || return 1
+    xray_binary="/usr/local/x-ui/bin/xray-linux-${xui_arch}"
+    if [[ -x "${xray_binary}" ]]; then
+        current_version="$("${xray_binary}" version 2>/dev/null \
+            | head -n 1 \
+            | awk '{print $2}')"
+    fi
+    if [[ "${current_version}" == "${target_version#v}" ]]; then
+        msg_ok "Xray-core ${target_version} is already installed and compatible with Podkop."
+        msg_blank
+        return 0
+    fi
+    mode="${XUI_INSTALLER_PODKOP_XRAY:-}"
+    if [[ -z "${mode}" ]]; then
+        if [[ -r /dev/tty && -w /dev/tty ]]; then
+            mode="ask"
+        else
+            mode="no"
+        fi
+    fi
+    case "${mode}" in
+        yes|YES|y|Y|true|TRUE|1)
+            ;;
+        no|NO|n|N|false|FALSE|0)
+            msg_blank
+            msg_inf "Skipping Podkop-compatible Xray setup."
+            msg_blank
+            return 0
+            ;;
+        ask)
+            if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then
+                msg_blank
+                msg_inf "Skipping Podkop-compatible Xray setup."
+                msg_blank
+                return 0
+            fi
+            msg_warn "Known Podkop/sing-box compatibility issue with Xray-core v26.9.8 and newer."
+            msg_inf "Tested compatible Xray-core version: ${target_version}"
+            msg_blank
+            printf "\e[1;33mInstall Xray-core ${target_version} for Podkop compatibility now? [y/N]: \e[0m" >/dev/tty
+            read -r answer </dev/tty || answer=""
+            case "${answer}" in
+                y|Y|yes|YES)
+                    ;;
+                *)
+                    msg_blank
+                    msg_inf "Skipping Podkop-compatible Xray setup."
+                    msg_blank
+                    return 0
+                    ;;
+            esac
+            ;;
+        *)
+            msg_blank
+            msg_warn "Unknown XUI_INSTALLER_PODKOP_XRAY='${mode}', skipping Podkop-compatible Xray setup."
+            msg_inf "Use XUI_INSTALLER_PODKOP_XRAY=yes to enable it automatically."
+            msg_blank
+            return 0
+            ;;
+    esac
+    wait_api_ready || return 1
+    api_login || return 1
+    msg_blank
+    msg_inf "Installing Xray-core ${target_version} for Podkop compatibility..."
+    response=$(api_curl_or_fail \
+        "XRAY VERSION SWITCH" \
+        "Failed to install Xray-core ${target_version}" \
+        -b "${API_COOKIE_FILE}" \
+        -H "Accept: application/json" \
+        -H "X-CSRF-Token: ${API_CSRF_TOKEN}" \
+        -X POST \
+        "$(api_url "/panel/api/server/installXray/${target_version}")") || return 1
+    if ! echo "${response}" | jq -e '.success == true' >/dev/null 2>&1; then
+        msg_blank
+        msg_warn "Xray-core ${target_version} installation was refused."
+        msg_warn "Panel response: ${response}"
+        msg_blank
+        return 1
+    fi
+    while (( retries > 0 )); do
+        status_response=$(curl -sk \
+            --connect-timeout 2 \
+            --max-time 5 \
+            -b "${API_COOKIE_FILE}" \
+            "$(api_url "/panel/api/server/status")" \
+            2>/dev/null || true)
+        installed_version=$(echo "${status_response}" \
+            | jq -r '.obj.xray.version // empty' \
+            2>/dev/null || true)
+        if [[ "${installed_version}" == "${target_version#v}" ]]; then
+            msg_blank
+            msg_ok "Xray-core ${target_version} installed successfully."
+            msg_blank
+            return 0
+        fi
+        sleep 1
+        ((retries--))
+    done
+    msg_blank
+    msg_warn "Xray-core version verification failed."
+    msg_warn "Expected: ${target_version#v}"
+    msg_warn "Detected: ${installed_version:-unknown}"
+    msg_blank
+    return 1
+}

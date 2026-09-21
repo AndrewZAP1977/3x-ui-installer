@@ -175,6 +175,8 @@ prepare_fake_sites
 reload_nginx
 run_smoke_checks
 maybe_setup_xui_fail2ban || msg_inf "Optional Fail2ban/IP Limit setup did not complete"
+maybe_setup_podkop_xray_compat || msg_inf "Optional Podkop-compatible Xray setup did not complete"
+run_smoke_checks
 msg_ok "Installation completed successfully !!!"
 echo
 wait_before_summary
