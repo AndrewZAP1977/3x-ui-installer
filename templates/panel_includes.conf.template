@@ -1,3 +1,12 @@
+### Block 3x-ui sponsor API ###
+
+location = /{{PANEL_PATH}}/sponsors
+{
+    default_type application/json;
+    add_header Cache-Control "no-store" always;
+    return 200 '{"success":true,"obj":{"sponsors":[]}}';
+}
+
 ### Subscription Path ###
 
 location = /{{SUB_PATH}}
