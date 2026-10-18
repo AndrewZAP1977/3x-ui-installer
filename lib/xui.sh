@@ -435,10 +435,11 @@ maybe_setup_podkop_xray_compat() {
                 msg_blank
                 return 0
             fi
-            msg_warn "Compatibility note: some Podkop/sing-box clients may fail with newer Xray-core."
-            msg_inf "Updated client engines may already support the latest Xray-core releases."
-            msg_inf "If unsure, keep the default version and test your connection first."
-            msg_inf "You can manually switch Xray-core versions later in the 3x-ui panel."
+            msg_warn "Stock sing-box fails REALITY with Xray-core v26.9.8+."
+            msg_inf "Podkop 0.7.24 + podkop-engine works with newer Xray-core (tested: v26.10.10)."
+            msg_inf "podkop-engine: https://github.com/FiyeroT/podkop-engine"
+            msg_inf "No downgrade to v26.7.28 is needed with this combination."
+            msg_inf "You can change Xray-core versions later in the 3x-ui panel."
             msg_blank
             printf "\e[1;33mInstall compatibility version ${target_version} now? [y/N]: \e[0m" >/dev/tty
             read -r answer </dev/tty || answer=""
