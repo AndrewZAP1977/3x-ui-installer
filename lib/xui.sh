@@ -436,7 +436,7 @@ maybe_setup_podkop_xray_compat() {
                 return 0
             fi
             msg_warn "Stock sing-box fails REALITY with Xray-core v26.9.8+."
-            msg_inf "Podkop 0.7.24 + podkop-engine works with newer Xray-core (tested: v26.10.10)."
+            msg_inf "Podkop 0.7.24 + podkop-engine works with newer Xray-core (tested: v26.10.21)."
             msg_inf "podkop-engine: https://github.com/FiyeroT/podkop-engine"
             msg_inf "No downgrade to v26.7.28 is needed with this combination."
             msg_inf "You can change Xray-core versions later in the 3x-ui panel."
